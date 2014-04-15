@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Picture;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
@@ -56,16 +57,9 @@ public class Fragment2 extends Fragment {
             
             @Override
             public void onClick(View v) {
-                    // Find out how large the view is
-                    int height = mWebView.getHeight();
-                    int width = mWebView.getWidth();
 
-                    // Create a white (canvas) which can be drawn on
-                    Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-                    Canvas canvas = new Canvas(bitmap);
-                    
-                    // Draw the webview content to the canvas
-                    mWebView.draw(canvas);
+                    // Create bitmap and call visibleRegion method
+                    Bitmap bitmap = getBitmapForVisibleRegion(mWebView);                                   
                     
                     // Determine filepath
                     String filePath = Environment.getExternalStorageDirectory() + "/Scrapr.png";
@@ -118,6 +112,17 @@ public class Fragment2 extends Fragment {
 			return false;
 		}
 	}
+	
+	
+	
+	public static Bitmap getBitmapForVisibleRegion(WebView webview) {
+	    Bitmap returnedBitmap = null;
+	    webview.setDrawingCacheEnabled(true);
+	    returnedBitmap = Bitmap.createBitmap(webview.getDrawingCache());
+	    webview.setDrawingCacheEnabled(false);
+	    return returnedBitmap;
+	}
+	
 
 	private class SwAWebClient extends WebViewClient {
 		@Override
