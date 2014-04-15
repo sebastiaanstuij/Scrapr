@@ -108,9 +108,9 @@ public class Fragment2 extends Fragment {
 
 	// called from activity onbackpressed
 	public boolean onBackPressed() {
-		// return true als je daadwerkelijk een webpagina terug bent gegaan.
-		// Als je op de eerste pagina zit, zou je bv. willen dat je de app
-		// afsluit met de terugknop
+		// return true if you have really gone back to a previous webpage
+		// When you have arived at the first visited webpage you would probably want to go back to the 
+		// previous navigation option of the app by pressing the back button
 		if (mWebView.canGoBack()) {
 			mWebView.goBack();
 			return true;
@@ -120,12 +120,10 @@ public class Fragment2 extends Fragment {
 	}
 
 	private class SwAWebClient extends WebViewClient {
-
 		@Override
 		public boolean shouldOverrideUrlLoading(WebView view, String url) {
 			return false;
 		}
-
 	}
 
 }
