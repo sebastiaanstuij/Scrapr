@@ -35,7 +35,6 @@ public class Fragment2 extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
 
         View v = inflater.inflate(R.layout.fragment2, container, false);
         
@@ -57,11 +56,11 @@ public class Fragment2 extends Fragment {
             
             @Override
             public void onClick(View v) {
-                    // Bekijk hoe groot de kaart is
+                    // Find out how large the view is
                     int height = mWebView.getHeight();
                     int width = mWebView.getWidth();
 
-                    // Creeer een witte afbeelding (canvas) waar opgetekend kan worden
+                    // Create a white (canvas) which can be drawn on
                     Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
                     Canvas canvas = new Canvas(bitmap);
                     
@@ -78,7 +77,6 @@ public class Fragment2 extends Fragment {
                     try {
                         bitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(file));
                     } catch (FileNotFoundException e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
         }});
@@ -88,7 +86,7 @@ public class Fragment2 extends Fragment {
             
             //setup webview, zoom options and load specified URL
             mWebView = (WebView) v.findViewById(R.id.webPage);
-            mWebView.getSettings().setJavaScriptEnabled(true);
+            //mWebView.getSettings().setJavaScriptEnabled(true);
             mWebView.setWebViewClient(new SwAWebClient());
             mWebView.getSettings().setBuiltInZoomControls(true);
             mWebView.getSettings().setDisplayZoomControls(false);
@@ -103,7 +101,7 @@ public class Fragment2 extends Fragment {
 		currentURL = url;
 
 		WebView wv = (WebView) getView().findViewById(R.id.webPage);
-		wv.getSettings().setJavaScriptEnabled(true);
+		//wv.getSettings().setJavaScriptEnabled(true);
 		wv.loadUrl(url);
 
 	}
