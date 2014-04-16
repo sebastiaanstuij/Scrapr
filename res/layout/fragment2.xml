@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -15,13 +15,22 @@
     
     <WebView android:id="@+id/webPage"
     	android:layout_height="0dp"
-    	android:layout_weight="1"
+
     	android:layout_width="match_parent"/>
 
     <Button
         android:id="@+id/btnScreenshot"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button" />
+        android:text="Snapshot" 
+        android:layout_alignParentBottom="true"/>
     
-</LinearLayout>
+    <Button
+        android:id="@+id/btnSelectionArea"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select"
+        android:layout_alignParentBottom="true"	
+        android:layout_toRightOf="@+id/btnScreenshot" />
+    
+</RelativeLayout>

@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Picture;
 import android.os.Bundle;
 import android.os.Environment;
@@ -52,8 +54,8 @@ public class Fragment2 extends Fragment {
             }
         });
         
-        Button button = (Button) v.findViewById(R.id.btnScreenshot);
-        button.setOnClickListener(new OnClickListener() {
+        Button buttonScreenshot = (Button) v.findViewById(R.id.btnScreenshot);
+        buttonScreenshot.setOnClickListener(new OnClickListener() {
             
             @Override
             public void onClick(View v) {
@@ -75,6 +77,24 @@ public class Fragment2 extends Fragment {
                     }
         }});
 
+        Button buttonSelectionArea = (Button) v.findViewById(R.id.btnSelectionArea);
+        buttonSelectionArea.setOnClickListener(new OnClickListener() {
+            
+            @Override
+            public void onClick(View v) {
+
+                    // Create bitmap and call visibleRegion method
+                    Bitmap bitmap = getBitmapForVisibleRegion(mWebView);                                   
+                    Canvas canvas = new Canvas(bitmap);
+                    Paint paint = new Paint();
+                    paint.setColor(Color.BLACK);
+                    paint.setStrokeWidth(3);
+                    canvas.drawRect(30, 30, 80, 80, paint);          
+                 
+        }});
+        
+       
+        
         if (currentURL != null) {
             Log.d("SwA", "Current URL  1[" + currentURL + "]");
             
