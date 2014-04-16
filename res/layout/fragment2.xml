@@ -31,6 +31,8 @@
 
     <WebView
         android:id="@+id/webPage"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_above="@+id/btnScreenshot"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
@@ -38,6 +40,8 @@
     
     <com.sebastiaanstuij.scrapr.SelectionView
         android:id="@+id/selectionView1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
        	android:layout_above="@+id/btnScreenshot"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"

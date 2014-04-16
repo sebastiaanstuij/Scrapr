@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Picture;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
@@ -20,6 +21,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.WebView.FindListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -30,6 +32,7 @@ public class Fragment2 extends Fragment {
 
 	private String currentURL = "http://slashdot.org/";
 	WebView mWebView;
+	SelectionView selectionView;
 
 	public void init(String url) {
 		currentURL = "http://slashdot.org/";
@@ -40,7 +43,8 @@ public class Fragment2 extends Fragment {
             Bundle savedInstanceState) {
 
         View v = inflater.inflate(R.layout.fragment2, container, false);
-        
+        selectionView = (SelectionView)v.findViewById(R.id.selectionView1);
+        selectionView.setVisibility(View.INVISIBLE);
         
         EditText address = (EditText) v.findViewById(R.id.address);
         address.setOnEditorActionListener(new OnEditorActionListener() {
@@ -61,7 +65,10 @@ public class Fragment2 extends Fragment {
             public void onClick(View v) {
 
                     // Create bitmap and call visibleRegion method
-                    Bitmap bitmap = getBitmapForVisibleRegion(mWebView);                                   
+                    Bitmap bitmap = getBitmapForVisibleRegion(mWebView);    
+                    Rect rect = selectionView.getSelection();
+                    
+                    bitmap = Bitmap.createBitmap(bitmap, rect.left, rect.top, (rect.width()), rect.height());
                     
                     // Determine filepath
                     String filePath = Environment.getExternalStorageDirectory() + "/Scrapr.png";
@@ -82,7 +89,7 @@ public class Fragment2 extends Fragment {
             
             @Override
             public void onClick(View v) {
-
+            	 selectionView.setVisibility(View.VISIBLE);
                     
                  
         }});
