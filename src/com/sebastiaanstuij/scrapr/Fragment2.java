@@ -83,13 +83,7 @@ public class Fragment2 extends Fragment {
             @Override
             public void onClick(View v) {
 
-                    // Create bitmap and call visibleRegion method
-                    Bitmap bitmap = getBitmapForVisibleRegion(mWebView);                                   
-                    Canvas canvas = new Canvas(bitmap);
-                    Paint paint = new Paint();
-                    paint.setColor(Color.BLACK);
-                    paint.setStrokeWidth(3);
-                    canvas.drawRect(30, 30, 80, 80, paint);          
+                    
                  
         }});
         
