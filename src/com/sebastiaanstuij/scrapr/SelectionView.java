@@ -16,7 +16,9 @@ public class SelectionView extends View {
 
     Paint paint = new Paint();
 	float X1, Y1, X2, Y2;
-
+	boolean mDrag;
+	float mDragX, mDragY;
+	float mDraggedX, mDraggedY;
 	
 	public SelectionView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -25,25 +27,28 @@ public class SelectionView extends View {
         paint.setStyle(Style.STROKE);
 	}
 
+	
+	//This method is called each time Android wants to draw a new screen
+	//Method is overridden with a custom draw Rectangle operation which is provided with coordinates from the OnTouchEvent
 	@Override
 	protected void onDraw(Canvas canvas) {
-		// TODO Auto-generated method stub
 		super.onDraw(canvas);
 		
-	    // Create bitmap and call visibleRegion method                                
+	    //Draw a rectangle with acquired coordinates                            
         canvas.drawRect(Math.min(X1, X2) - mDragX + mDraggedX, Math.min(Y1, Y2) - mDragY + mDraggedY, Math.max(X1, X2) - mDragX + mDraggedX, Math.max(Y1, Y2) - mDragY + mDraggedY, paint);
 	}
-	
-	boolean mDrag;
-	float mDragX, mDragY;
-	float mDraggedX, mDraggedY;
-	
+		
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
+		// TODO check which finger is being used when there are multiple fingers touching the screen
+		//When the user touches the screen after the selection button has been pressed this method is fired
+		//Check whether the finger was an 'action down' action
 		if (event.getAction() == MotionEvent.ACTION_DOWN) {
+			//get X and Y coordinates from 1st finger (0)
 			float X = event.getX(0);
 			float Y = event.getY(0);
 			
+			//If new X coordinate lies between X1 and X2 (same for Y) then the user is busy dragging the window
 			if (X > Math.min(X1, X2) && X < Math.max(X1, X2) && Y > Math.min(Y1, Y2) && Y < Math.max(Y1, Y2)) {
 				mDrag = true;
 				mDragX = X;
@@ -81,6 +86,7 @@ public class SelectionView extends View {
 			mDraggedY = 0;
 		}
 		
+		//Call invalidate so that android redraws screen by calling onDraw()
 		invalidate();
 		
 		return true;
