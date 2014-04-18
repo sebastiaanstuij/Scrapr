@@ -4,27 +4,25 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Picture;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.webkit.WebView.FindListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -34,14 +32,15 @@ import android.widget.TextView.OnEditorActionListener;
 public class Fragment2 extends Fragment {
 
 	private String currentURL = "http://slashdot.org/";
-	WebView mWebView;
-	SelectionView selectionView;
-	
+	private WebView mWebView;
+	private SelectionView selectionView;
+
 
 	public void init(String url) {
 		currentURL = "http://slashdot.org/";
 	}
 
+	@SuppressLint("SetJavaScriptEnabled")
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
@@ -62,9 +61,10 @@ public class Fragment2 extends Fragment {
             }
         });
         
+        
+        
         Button buttonScreenshot = (Button) v.findViewById(R.id.btnScreenshot);
-        buttonScreenshot.setOnClickListener(new OnClickListener() {
-            
+        buttonScreenshot.setOnClickListener(new OnClickListener() {    
             @Override
             public void onClick(View v) {
 
@@ -88,18 +88,18 @@ public class Fragment2 extends Fragment {
                     }
         }});
 
+        
+        
         Button buttonSelectionArea = (Button) v.findViewById(R.id.btnSelectionArea);
-        buttonSelectionArea.setOnClickListener(new OnClickListener() {
-            
+        buttonSelectionArea.setOnClickListener(new OnClickListener() {         
             @Override
             public void onClick(View v) {
-            	startSupportActionMode();
-
-            	selectionView.setVisibility(View.VISIBLE);
-                    
-                 
+            	((ActionBarActivity) getActivity()).startSupportActionMode(mActionModeCallback);            	 
+            	selectionView.setVisibility(View.VISIBLE);                                 
         }});
          
+        
+        
         if (currentURL != null) {
             Log.d("SwA", "Current URL  1[" + currentURL + "]");
             
@@ -115,6 +115,7 @@ public class Fragment2 extends Fragment {
     }
 
 	
+	@SuppressLint("SetJavaScriptEnabled")
 	public void updateUrl(String url) {
 		Log.d("SwA", "Update URL [" + url + "] - View [" + getView() + "]");
 		currentURL = url;
@@ -126,6 +127,7 @@ public class Fragment2 extends Fragment {
 	}
 
 	// called from activity onbackpressed
+	@SuppressLint("SetJavaScriptEnabled")
 	public boolean onBackPressed() {
 		// return true if you have really gone back to a previous webpage
 		// When you have arived at the first visited webpage you would probably want to go back to the 
@@ -156,34 +158,45 @@ public class Fragment2 extends Fragment {
 		}
 	}
 
-	class ActionBarCallBack implements ActionMode.Callback {
-		 
-		@Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            // TODO Auto-generated method stub
-            return false;
-        }
- 
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            // TODO Auto-generated method stub
-            mode.getMenuInflater().inflate(R.menu.contextual_menu, menu);
-            return true;
-        }
- 
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            // TODO Auto-generated method stub
- 
-        }
- 
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            // TODO Auto-generated method stub
- 
- 
-       
-    }
+	private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
+
+	    // Called when the action mode is created; startActionMode() was called
+	    @Override
+	    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+	        // Inflate a menu resource providing context menu items
+	        MenuInflater inflater = mode.getMenuInflater();
+	        inflater.inflate(R.menu.context_menu, menu);
+	        
+	        return true;
+	    }
+
+	    // Called each time the action mode is shown. Always called after onCreateActionMode, but
+	    // may be called multiple times if the mode is invalidated.
+	    @Override
+	    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+	        return false; // Return false if nothing is done
+	    }
+
+	    // Called when the user selects a contextual menu item
+	    @Override
+	    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+			return false;
+	     /*   switch (item.getItemId()) {
+	            case R.id.menu_share:
+	                shareCurrentItem();
+	                mode.finish(); // Action picked, so close the CAB
+	                return true;
+	            default:
+	                return false;
+	        }*/
+	    }
+
+	    // Called when the user exits the action mode
+	    @Override
+	    public void onDestroyActionMode(ActionMode mode) {
+	        //mActionMode = null;
+	    }
+	};
 	
 	
 	

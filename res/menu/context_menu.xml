@@ -1,0 +1,24 @@
+<menu xmlns:scrapr="http://schemas.android.com/apk/res-auto" 
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+
+     <item 
+         android:id="@+id/action_cancel"
+         android:icon="@drawable/ic_action_cancel"
+         android:title="@string/action_cancel"
+         scrapr:showAsAction="always"  />
+     
+      <item
+        android:id="@+id/action_selection"
+        android:title="@string/action_selection"
+        android:icon="@drawable/ic_action_new_selection"
+        scrapr:showAsAction="always" />
+          
+   
+      <item
+        android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        scrapr:actionProviderClass="android.support.v7.widget.ShareActionProvider"
+        scrapr:showAsAction="never" />
+    
+
+</menu>
