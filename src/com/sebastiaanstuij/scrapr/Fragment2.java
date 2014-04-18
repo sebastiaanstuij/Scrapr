@@ -13,9 +13,12 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
+import android.support.v7.view.ActionMode;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -33,6 +36,7 @@ public class Fragment2 extends Fragment {
 	private String currentURL = "http://slashdot.org/";
 	WebView mWebView;
 	SelectionView selectionView;
+	
 
 	public void init(String url) {
 		currentURL = "http://slashdot.org/";
@@ -89,19 +93,19 @@ public class Fragment2 extends Fragment {
             
             @Override
             public void onClick(View v) {
-            	 selectionView.setVisibility(View.VISIBLE);
+            	startSupportActionMode();
+
+            	selectionView.setVisibility(View.VISIBLE);
                     
                  
         }});
-        
-       
-        
+         
         if (currentURL != null) {
             Log.d("SwA", "Current URL  1[" + currentURL + "]");
             
             //setup webview, zoom options and load specified URL
             mWebView = (WebView) v.findViewById(R.id.webPage);
-            //mWebView.getSettings().setJavaScriptEnabled(true);
+            mWebView.getSettings().setJavaScriptEnabled(true);
             mWebView.setWebViewClient(new SwAWebClient());
             mWebView.getSettings().setBuiltInZoomControls(true);
             mWebView.getSettings().setDisplayZoomControls(false);
@@ -116,7 +120,7 @@ public class Fragment2 extends Fragment {
 		currentURL = url;
 
 		WebView wv = (WebView) getView().findViewById(R.id.webPage);
-		//wv.getSettings().setJavaScriptEnabled(true);
+		wv.getSettings().setJavaScriptEnabled(true);
 		wv.loadUrl(url);
 
 	}
@@ -152,4 +156,35 @@ public class Fragment2 extends Fragment {
 		}
 	}
 
+	class ActionBarCallBack implements ActionMode.Callback {
+		 
+		@Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+ 
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            // TODO Auto-generated method stub
+            mode.getMenuInflater().inflate(R.menu.contextual_menu, menu);
+            return true;
+        }
+ 
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            // TODO Auto-generated method stub
+ 
+        }
+ 
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            // TODO Auto-generated method stub
+ 
+ 
+       
+    }
+	
+	
+	
 }

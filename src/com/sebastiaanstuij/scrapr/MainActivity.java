@@ -202,7 +202,7 @@ public class MainActivity extends ActionBarActivity {
     {
     	// Kijk of mFragment2 een object bevat. Zo ja, dan is hij in beeld. In selectItem wordt namelijk mFragment2
     	if (mFragment2 != null) {
-    		// Als de functie waar is, be?indig de huidige functie, zodat super.onBackPressed(); niet wordt uitgevoerd
+    		// Als de functie waar is, beeindig de huidige functie, zodat super.onBackPressed(); niet wordt uitgevoerd
     		// Als je deze wel uitvoert, heb je ook nog dat je een scherm terug gaat en dat wil je niet
     		if (mFragment2.onBackPressed()) {
     			return;
