@@ -13,27 +13,22 @@
         android:ems="10"
         android:inputType="textUri" >
     </EditText>
-    
-    <Button
-        android:id="@+id/btnScreenshot"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Snapshot" 
-        android:layout_alignParentBottom="true"/>
-    
+      
     <Button
         android:id="@+id/btnSelectionArea"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Select"
-        android:layout_alignParentBottom="true"	
-        android:layout_toRightOf="@+id/btnScreenshot" />
+        android:text="Start Scraping!"
+        android:background="@drawable/custom_button"        
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true" />
+
 
     <WebView
         android:id="@+id/webPage"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_above="@+id/btnScreenshot"
+        android:layout_above="@+id/btnSelectionArea"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/address" />
@@ -42,7 +37,7 @@
         android:id="@+id/selectionView1"
         android:layout_width="0dp"
         android:layout_height="0dp"
-       	android:layout_above="@+id/btnScreenshot"
+       	android:layout_above="@+id/btnSelectionArea"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/address"  />

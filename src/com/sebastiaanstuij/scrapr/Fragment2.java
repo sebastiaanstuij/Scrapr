@@ -3,7 +3,6 @@ package com.sebastiaanstuij.scrapr;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
@@ -63,7 +62,7 @@ public class Fragment2 extends Fragment {
         
         
         
-        Button buttonScreenshot = (Button) v.findViewById(R.id.btnScreenshot);
+/*        Button buttonScreenshot = (Button) v.findViewById(R.id.btnScreenshot);
         buttonScreenshot.setOnClickListener(new OnClickListener() {    
             @Override
             public void onClick(View v) {
@@ -87,7 +86,7 @@ public class Fragment2 extends Fragment {
                         e.printStackTrace();
                     }
         }});
-
+*/
         
         
         Button buttonSelectionArea = (Button) v.findViewById(R.id.btnSelectionArea);
