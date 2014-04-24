@@ -32,6 +32,7 @@ public class MainActivity extends ActionBarActivity {
     private CharSequence mTitle;
     
     private Fragment2 mFragment2 = null;
+    public static final String PREFS_NAME = "MyPrefsFile";
 	
 	
 	@Override

@@ -3,9 +3,11 @@ package com.sebastiaanstuij.scrapr;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -13,6 +15,7 @@ import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -135,8 +138,6 @@ public class Fragment2 extends Fragment {
 		}
 	}
 	
-	
-	
 	public static Bitmap getBitmapForVisibleRegion(WebView webview) {
 	    Bitmap returnedBitmap = null;
 	    webview.setDrawingCacheEnabled(true);
@@ -183,20 +184,41 @@ public class Fragment2 extends Fragment {
                     
                     bitmap = Bitmap.createBitmap(bitmap, rect.left, rect.top, (rect.width()), rect.height());
                     
-                    // Determine filepath
-                    String filePath = Environment.getExternalStorageDirectory() + "/Scrapr.png";
-                    
-                    // Create new File
+                    // Create Scrapr folder if it does not exist and create new  filepath and File
+                    File folder = new File(Environment.getExternalStorageDirectory() + "/Scrapr");
+                    String curDate = (DateFormat.format("dd-MM-yyyy hh:mm:ss", new java.util.Date()).toString());
+					String filePath = Environment.getExternalStorageDirectory() + "/Scrapr/" + "curDate" + ".png";				
                     File file = new File(filePath);
-
-                    // And try to compress and write it 
-                    try {
-                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(file));
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
+                    
+                    try { 
+                    	folder.mkdir();
+                    	bitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(file));
+                    } 
+                    
+                    catch (IOException e) { 
+                    	//TODO opslaan ging fout
+                    	e.printStackTrace();                  	
                     }
+                    
+                  
+                    
+                    // Add screenshot properties to sharedPreferences so that it can be accessed in MainActivity
+                    SharedPreferences settings = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, 0);
+                    SharedPreferences.Editor editor = settings.edit();
+                    int size = settings.getInt("array_size", 0);
+                    
+                    
+                    editor.putString(test, filePath);
+                    editor.putInt(test, mWebView.getX());
+                    editor.putInt("array_size", size+1);
+                    
+                    
+                    // Commit the edits!
+                    editor.commit();
+           
 	                mode.finish(); // Action picked, so close the CAB
 	                return true;
+	                
 	            default:
 	                return false;
 	        }
