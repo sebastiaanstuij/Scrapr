@@ -3,6 +3,7 @@ package com.sebastiaanstuij.scrapr;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -21,7 +22,7 @@ public class Fragment1 extends Fragment implements OnItemClickListener {
 
 	String[] website_names = {"Website A", "Website B"};
 	//find a way to store images in array
-	TypedArray screen_pics;
+	Screenshot screenshots[];
 	String[] product_names = {"Product A", "Product B"};
 	String[] dates_added = {"01-04-2014", "01-05-2014"};
 	
@@ -45,7 +46,7 @@ public class Fragment1 extends Fragment implements OnItemClickListener {
 		rowItems = new ArrayList<RowItem>();
 		for (int i = 0; i < website_names.length; i++) {
 			RowItem item = new RowItem(website_names[i],
-					screen_pics.getResourceId(i, -1), dates_added[i],
+					screenshots.getResourceId(i, -1), dates_added[i],
 					product_names[i]);
 			rowItems.add(item);
 		}
@@ -53,10 +54,17 @@ public class Fragment1 extends Fragment implements OnItemClickListener {
 		mylistView = (ListView) view.findViewById(R.id.list);
 		CustomAdapter adapter = new CustomAdapter(getActivity().getApplicationContext(), rowItems);
 		mylistView.setAdapter(adapter);
-		screen_pics.recycle();
+		//screenshots.recycle();
 		mylistView.setOnItemClickListener(this);
 			
 		return view;		 
+	}
+	
+	
+	@Override
+	public void onAttach(Activity activity) {
+		screen_pics = getResources().obtainTypedArray(R.array.screenshot_pics);
+		super.onAttach(activity);
 	}
 
 	@Override

@@ -3,6 +3,8 @@ package com.sebastiaanstuij.scrapr;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.lang.reflect.InvocationTargetException;
+
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
@@ -26,6 +28,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+import android.widget.ZoomButtonsController;
 
 
 public class Fragment2 extends Fragment {
@@ -59,35 +62,7 @@ public class Fragment2 extends Fragment {
                 return true;
             }
         });
-        
-        
-        
-/*        Button buttonScreenshot = (Button) v.findViewById(R.id.btnScreenshot);
-        buttonScreenshot.setOnClickListener(new OnClickListener() {    
-            @Override
-            public void onClick(View v) {
-
-                    // Create bitmap and call visibleRegion method
-                    Bitmap bitmap = getBitmapForVisibleRegion(mWebView);    
-                    Rect rect = selectionView.getSelection();
-                    
-                    bitmap = Bitmap.createBitmap(bitmap, rect.left, rect.top, (rect.width()), rect.height());
-                    
-                    // Determine filepath
-                    String filePath = Environment.getExternalStorageDirectory() + "/Scrapr.png";
-                    
-                    // Create new File
-                    File file = new File(filePath);
-
-                    // And try to compress and write it 
-                    try {
-                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(file));
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
-        }});
-*/
-        
+               
         
         Button buttonSelectionArea = (Button) v.findViewById(R.id.btnSelectionArea);
         buttonSelectionArea.setOnClickListener(new OnClickListener() {         
@@ -107,7 +82,28 @@ public class Fragment2 extends Fragment {
             mWebView.getSettings().setJavaScriptEnabled(true);
             mWebView.setWebViewClient(new SwAWebClient());
             mWebView.getSettings().setBuiltInZoomControls(true);
-            mWebView.getSettings().setDisplayZoomControls(false);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
+                // Use the API 11+ calls to disable the controls
+                // Use a seperate class to obtain 1.6 compatibility
+                new Runnable() {
+                  @SuppressLint("NewApi")
+				public void run() {
+                    mWebView.getSettings().setDisplayZoomControls(false);
+                  }
+                }.run();
+              } else {
+                ZoomButtonsController zoom_controll;
+				try {
+					zoom_controll = (ZoomButtonsController) mWebView.getClass().getMethod("getZoomButtonsController").invoke(mWebView, null);
+					zoom_controll.getContainer().setVisibility(View.GONE);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+                
+              }
+            
+            
+            //mWebView.getSettings().setDisplayZoomControls(false);
             mWebView.loadUrl(currentURL);
         }
         return v;
@@ -178,17 +174,34 @@ public class Fragment2 extends Fragment {
 
 	    // Called when the user selects a contextual menu item
 	    @Override
-	    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			return false;
-	     /*   switch (item.getItemId()) {
-	            case R.id.menu_share:
-	                shareCurrentItem();
+	    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {	
+	        switch (item.getItemId()) {
+	            case R.id.action_selection:
+	            	// Create bitmap and call visibleRegion method
+                    Bitmap bitmap = getBitmapForVisibleRegion(mWebView);    
+                    Rect rect = selectionView.getSelection();
+                    
+                    bitmap = Bitmap.createBitmap(bitmap, rect.left, rect.top, (rect.width()), rect.height());
+                    
+                    // Determine filepath
+                    String filePath = Environment.getExternalStorageDirectory() + "/Scrapr.png";
+                    
+                    // Create new File
+                    File file = new File(filePath);
+
+                    // And try to compress and write it 
+                    try {
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(file));
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
 	                mode.finish(); // Action picked, so close the CAB
 	                return true;
 	            default:
 	                return false;
-	        }*/
+	        }
 	    }
+	    
 
 	    // Called when the user exits the action mode
 	    @Override

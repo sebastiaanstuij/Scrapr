@@ -17,4 +17,8 @@
     <string name="action_websearch">Web search</string>
     <string name="app_not_available">Sorry, there\'s no web browser available</string>
     
+     <array name="screenshot_pics">
+        <item>@drawable/ic_action_camera</item>
+        <item>@drawable/ic_action_new_selection</item>
+    </array>
 </resources>
