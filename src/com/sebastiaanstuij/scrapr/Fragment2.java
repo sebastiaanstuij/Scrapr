@@ -187,37 +187,39 @@ public class Fragment2 extends Fragment {
                     // Create Scrapr folder if it does not exist and create new  filepath and File
                     File folder = new File(Environment.getExternalStorageDirectory() + "/Scrapr");
                     String curDate = (DateFormat.format("dd-MM-yyyy hh:mm:ss", new java.util.Date()).toString());
-					String filePath = Environment.getExternalStorageDirectory() + "/Scrapr/" + "curDate" + ".png";				
+					String filePath = Environment.getExternalStorageDirectory() + "/Scrapr/" + curDate + ".png";				
                     File file = new File(filePath);
                     
                     try { 
                     	folder.mkdir();
-                    	bitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(file));
+                    	bitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(file));                      
+                    	
+                        // Add screenshot properties to sharedPreferences so that it can be accessed in MainActivity
+                        SharedPreferences settings = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, 0);
+                        SharedPreferences.Editor editor = settings.edit();
+                        
+                    	int size = settings.getInt("array_size", 0); // Get size of Sceenshot Array, or create new size preference 
+                        editor.putString("filePath_" + size, filePath);
+                        editor.putString("url_" + size, currentURL);
+                        editor.putInt("x_cor_" + size, (int) mWebView.getLeft());
+                        editor.putInt("y_cor_" + size, (int) mWebView.getTop());
+                        editor.putInt("zoom_lvl_" + size, (int) mWebView.getScale());
+                        editor.putInt("array_size", size+1);                        
+                        
+                        // Commit the edits!
+                        editor.commit();
+               
+                        // Action picked, so close the CAB and return true
+    	                mode.finish(); 
+    	                return true;
+                    	
                     } 
                     
                     catch (IOException e) { 
                     	//TODO opslaan ging fout
                     	e.printStackTrace();                  	
                     }
-                    
-                  
-                    
-                    // Add screenshot properties to sharedPreferences so that it can be accessed in MainActivity
-                    SharedPreferences settings = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, 0);
-                    SharedPreferences.Editor editor = settings.edit();
-                    int size = settings.getInt("array_size", 0);
-                    
-                    
-                    editor.putString(test, filePath);
-                    editor.putInt(test, mWebView.getX());
-                    editor.putInt("array_size", size+1);
-                    
-                    
-                    // Commit the edits!
-                    editor.commit();
-           
-	                mode.finish(); // Action picked, so close the CAB
-	                return true;
+   
 	                
 	            default:
 	                return false;

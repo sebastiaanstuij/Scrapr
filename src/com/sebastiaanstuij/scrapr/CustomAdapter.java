@@ -4,6 +4,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,27 +15,27 @@ import android.widget.TextView;
 public class CustomAdapter extends BaseAdapter {
 
 	Context context;
-	List<RowItem> rowItems;
+	Screenshot[] rowItems;
 
 	
-	CustomAdapter(Context context, List<RowItem> rowItems) {
+	CustomAdapter(Context context, Screenshot[] rowItems) {
 		this.context = context;
 		this.rowItems = rowItems;
 	}
 
 	@Override
 	public int getCount() {
-		return rowItems.size();
+		return rowItems.length;
 	}
 
 	@Override
-	public Object getItem(int position) {
-		return rowItems.get(position);
+	public Screenshot getItem(int position) {
+		return (Screenshot) rowItems[position];
 	}
 
 	@Override
 	public long getItemId(int position) {
-		return rowItems.indexOf(getItem(position));
+		return position;
 	}
 
 	 /* private view holder class */
@@ -65,12 +66,12 @@ public class CustomAdapter extends BaseAdapter {
 			holder.product_description = (TextView) convertView
 					.findViewById(R.id.productSubtitle);
 
-			RowItem row_pos = rowItems.get(position);
+			Screenshot row_pos = rowItems[position];
 
-			holder.screenshot_pic.setImageResource(row_pos.getProfile_pic_id());
-			holder.website_description.setText(row_pos.getMember_name());
-			holder.date_added.setText(row_pos.getStatus());
-			holder.product_description.setText(row_pos.getContactType());
+			holder.screenshot_pic.setImageURI(Uri.parse(row_pos.filePath));
+			holder.website_description.setText(row_pos.url);
+			holder.date_added.setText("test");
+			holder.product_description.setText("test");
 
 			convertView.setTag(holder);
 		} else {

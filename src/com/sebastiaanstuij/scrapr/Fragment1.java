@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -22,11 +23,11 @@ public class Fragment1 extends Fragment implements OnItemClickListener {
 
 	String[] website_names = {"Website A", "Website B"};
 	//find a way to store images in array
-	Screenshot screenshots[];
 	String[] product_names = {"Product A", "Product B"};
 	String[] dates_added = {"01-04-2014", "01-05-2014"};
 	
-	List<RowItem> rowItems;
+	Screenshot[] screenshotArray;
+	//List<RowItem> rowItems;
 	ListView mylistView;
 
 
@@ -36,23 +37,29 @@ public class Fragment1 extends Fragment implements OnItemClickListener {
 		
 		View view = inflater.inflate(R.layout.fragment1, null);	
 		
-		//update websites_names 
-		//update screen_pics;
-		//update product_names;
-		//update dates_added;
-				
+		SharedPreferences settings = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, 0);
 		
+        int size = settings.getInt("array_size", 0);
+        screenshotArray = new Screenshot[size];
+        
+        for (int i=0; i<size; i++) {
+        	screenshotArray[i] = new Screenshot();
+        	screenshotArray[i].x = settings.getInt("x_" + i, 0);
+        	screenshotArray[i].y = settings.getInt("y_" + i, 0);
+        	screenshotArray[i].zoom = settings.getInt("zoom_" + i, 0);
+        	screenshotArray[i].filePath = settings.getString("filePath_" + i, "NA");
+        }
 		
-		rowItems = new ArrayList<RowItem>();
-		for (int i = 0; i < website_names.length; i++) {
+		/*rowItems = new ArrayList<RowItem>();
+		for (int i = 0; i < size; i++) {
 			RowItem item = new RowItem(website_names[i],
 					screenshots.getResourceId(i, -1), dates_added[i],
 					product_names[i]);
 			rowItems.add(item);
-		}
+		}*/
 		
 		mylistView = (ListView) view.findViewById(R.id.list);
-		CustomAdapter adapter = new CustomAdapter(getActivity().getApplicationContext(), rowItems);
+		CustomAdapter adapter = new CustomAdapter(getActivity().getApplicationContext(), screenshotArray);
 		mylistView.setAdapter(adapter);
 		//screenshots.recycle();
 		mylistView.setOnItemClickListener(this);
@@ -63,7 +70,7 @@ public class Fragment1 extends Fragment implements OnItemClickListener {
 	
 	@Override
 	public void onAttach(Activity activity) {
-		screen_pics = getResources().obtainTypedArray(R.array.screenshot_pics);
+		//screen_pics = getResources().obtainTypedArray(R.array.screenshot_pics);
 		super.onAttach(activity);
 	}
 
@@ -71,7 +78,7 @@ public class Fragment1 extends Fragment implements OnItemClickListener {
 	public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
 		// TODO Auto-generated method stub
 
-		String member_name = rowItems.get(position).getMember_name();
+		String member_name = screenshotArray[position].url;
 		Toast.makeText(getActivity().getApplicationContext(), "" + member_name,
 				Toast.LENGTH_SHORT).show();
 	}
