@@ -1,30 +1,20 @@
 package com.sebastiaanstuij.scrapr;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Activity;
 import android.content.SharedPreferences;
-import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 
 public class Fragment1 extends Fragment implements OnItemClickListener {
 
-	String[] website_names = {"Website A", "Website B"};
-	//find a way to store images in array
-	String[] product_names = {"Product A", "Product B"};
-	String[] dates_added = {"01-04-2014", "01-05-2014"};
 	
 	Screenshot[] screenshotArray;
 	//List<RowItem> rowItems;
@@ -49,14 +39,7 @@ public class Fragment1 extends Fragment implements OnItemClickListener {
         	screenshotArray[i].zoom = settings.getInt("zoom_" + i, 0);
         	screenshotArray[i].filePath = settings.getString("filePath_" + i, "NA");
         }
-		
-		/*rowItems = new ArrayList<RowItem>();
-		for (int i = 0; i < size; i++) {
-			RowItem item = new RowItem(website_names[i],
-					screenshots.getResourceId(i, -1), dates_added[i],
-					product_names[i]);
-			rowItems.add(item);
-		}*/
+
 		
 		mylistView = (ListView) view.findViewById(R.id.list);
 		CustomAdapter adapter = new CustomAdapter(getActivity().getApplicationContext(), screenshotArray);
