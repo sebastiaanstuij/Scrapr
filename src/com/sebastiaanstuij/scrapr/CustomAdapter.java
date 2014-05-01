@@ -68,7 +68,7 @@ public class CustomAdapter extends BaseAdapter {
 
 			Screenshot row_pos = rowItems[position];
 
-			holder.screenshot_pic.setImageURI(Uri.parse(row_pos.filePath));
+			holder.screenshot_pic.setImageURI(Uri.parse(row_pos.iconFilePath));
 			holder.website_description.setText(row_pos.url);
 			holder.date_added.setText("test");
 			holder.product_description.setText("test");
