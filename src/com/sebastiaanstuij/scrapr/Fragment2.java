@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
+import com.googlecode.tesseract.android.TessBaseAPI;
+
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -25,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.webkit.WebIconDatabase;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
@@ -36,13 +39,15 @@ import android.widget.ZoomButtonsController;
 
 public class Fragment2 extends Fragment {
 
-	private String currentURL = "http://slashdot.org/";
+	private String currentURL = "http://www.google.com";
 	private WebView mWebView;
 	private SelectionView selectionView;
-
-
+	public static final String DATA_PATH = Environment.getExternalStorageDirectory().toString() + "/Scrapr/";
+    public static final String lang = "eng";
+	public static final String OCR_DATA_PATH = DATA_PATH + "tessdata/" + lang + ".traineddata";
+			
 	public void init(String url) {
-		currentURL = "http://slashdot.org/";
+		currentURL = "http://www.google.com";
 	}
 
 	@SuppressLint("SetJavaScriptEnabled")
@@ -61,7 +66,7 @@ public class Fragment2 extends Fragment {
             public boolean onEditorAction(TextView v, int actionId,
                     KeyEvent event) {
                 mWebView.loadUrl("http://" + v.getText().toString());
-
+                
                 return true;
             }
         });
@@ -179,28 +184,36 @@ public class Fragment2 extends Fragment {
 	        switch (item.getItemId()) {
 	            case R.id.action_selection:
 	            	// Create bitmap and call visibleRegion method
-                    Bitmap screenshotBitmap = getBitmapForVisibleRegion(mWebView);
-                    Bitmap iconBitmap =  mWebView.getFavicon();
-                    
+                    Bitmap screenshotBitmap = getBitmapForVisibleRegion(mWebView);         
                     Rect rect = selectionView.getSelection();
                     
                     screenshotBitmap = Bitmap.createBitmap(screenshotBitmap, rect.left, rect.top, (rect.width()), rect.height());
+     
+                    Bitmap iconBitmap =  mWebView.getFavicon();
+                    if (iconBitmap == null){
+                    	iconBitmap = screenshotBitmap;
+                    }
                     
-                    // Create Scrapr folder if it does not exist and create new  filepath and File
-                    File folder = new File(Environment.getExternalStorageDirectory() + "/Scrapr");
+                    
                     String curDate = (DateFormat.format("dd-MM-yyyy hh:mm:ss", new java.util.Date()).toString());
-					String screenshotFilePath = Environment.getExternalStorageDirectory() + "/Scrapr/" + "screenshot_" + curDate + ".png";
-					String iconFilePath = Environment.getExternalStorageDirectory() + "/Scrapr/" + "icon_" + curDate + ".png";
+					String screenshotFilePath = DATA_PATH + "screenshot_" + curDate + ".png";
+					String iconFilePath = DATA_PATH + "icon_" + curDate + ".png";
 
 					
                     File screenshotFile = new File(screenshotFilePath);
                     File iconFile = new File(iconFilePath);
                     
+                    
+                    TessBaseAPI baseApi = new TessBaseAPI();
+                    baseApi.init(DATA_PATH, "eng");
+                    baseApi.setImage(screenshotBitmap);
+                    String recognizedText = baseApi.getUTF8Text();
+                    baseApi.end();
+                    
                     try { 
-                    	folder.mkdir();
                     	screenshotBitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(screenshotFile));                      
                     	iconBitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(iconFile));                      
-
+                    	
                         // Add screenshot properties to sharedPreferences so that it can be accessed in MainActivity
                         SharedPreferences settings = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, 0);
                         SharedPreferences.Editor editor = settings.edit();
@@ -208,6 +221,7 @@ public class Fragment2 extends Fragment {
                     	int size = settings.getInt("array_size", 0); // Get size of Sceenshot Array, or create new size preference 
                         editor.putString("screenshotFilePath_" + size, screenshotFilePath);
                         editor.putString("iconFilePath_" + size, iconFilePath);
+                        editor.putString("recognizedText_" + size, recognizedText);
                         editor.putString("url_" + size, mWebView.getUrl());
                         editor.putInt("x_cor_" + size, (int) mWebView.getLeft());
                         editor.putInt("y_cor_" + size, (int) mWebView.getTop());

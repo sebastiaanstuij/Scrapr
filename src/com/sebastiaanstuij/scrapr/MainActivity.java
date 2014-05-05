@@ -1,7 +1,15 @@
 package com.sebastiaanstuij.scrapr;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -9,6 +17,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,12 +43,23 @@ public class MainActivity extends ActionBarActivity {
     private Fragment2 mFragment2 = null;
     public static final String PREFS_NAME = "MyPrefsFile";
 	
+    
+    public static final String DATA_PATH = Environment.getExternalStorageDirectory().toString() + "/Scrapr/tessdata/";
+    public static final String lang = "eng";
+	private static final String TAG = "MainActivity.java";
+    
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
+		
+        // Create Scrapr folder if it does not exist and create new  filepath and File
+        File folder = new File(DATA_PATH);
+    	folder.mkdir();
+		
+			
 		mTitle = mDrawerTitle = getTitle();
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerList = (ListView) findViewById(R.id.left_drawer);
@@ -85,6 +105,34 @@ public class MainActivity extends ActionBarActivity {
         };
         
         mDrawer.setDrawerListener(mDrawerToggle);
+        
+        
+        if (!(new File(DATA_PATH + lang + ".traineddata")).exists()) {
+			try {
+
+				AssetManager assetManager = getAssets();
+				InputStream in = assetManager.open("tessdata/" + lang + ".traineddata");
+				//GZIPInputStream gin = new GZIPInputStream(in);
+				OutputStream out = new FileOutputStream(DATA_PATH + lang + ".traineddata");
+
+				// Transfer bytes from in to out
+				byte[] buf = new byte[1024];
+				int len;
+				//while ((lenf = gin.read(buff)) > 0) {
+				while ((len = in.read(buf)) > 0) {
+					out.write(buf, 0, len);
+				}
+				in.close();
+				//gin.close();
+				out.close();
+
+				Log.v(TAG, "Copied " + lang + " traineddata");
+			} catch (IOException e) {
+				Log.e(TAG, "Was unable to copy " + lang + " traineddata " + e.toString());
+			}
+		}
+        
+        
 	}
 	
 	@Override

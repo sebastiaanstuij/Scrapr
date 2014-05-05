@@ -40,6 +40,7 @@ public class Fragment1 extends Fragment implements OnItemClickListener {
         	screenshotArray[i].url = settings.getString("url_" + i, "");
         	screenshotArray[i].screenshotFilePath = settings.getString("screenshotFilePath_" + i, "NA");
         	screenshotArray[i].iconFilePath = settings.getString("iconFilePath_" + i, "NA");
+        	screenshotArray[i].recognizedText = settings.getString("recognizedText_" + i, "NA");
         }
 
 		
@@ -63,9 +64,8 @@ public class Fragment1 extends Fragment implements OnItemClickListener {
 	public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
 		// TODO Auto-generated method stub
 
-		String url = screenshotArray[position].url;
-		String filepath = screenshotArray[position].screenshotFilePath;
-		Toast.makeText(getActivity().getApplicationContext(), url + "_" + filepath,
+		String recognizedText = screenshotArray[position].recognizedText;
+		Toast.makeText(getActivity().getApplicationContext(), recognizedText,
 				Toast.LENGTH_SHORT).show();
 	}
 
