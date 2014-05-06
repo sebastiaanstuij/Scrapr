@@ -26,7 +26,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-
 // this Activity extends ListActivity so it indicates that it contains a listview object in its layout
 // and can be populated with data with the setListAdapter() method 
 public class MainActivity extends ActionBarActivity {
@@ -43,8 +42,9 @@ public class MainActivity extends ActionBarActivity {
     private Fragment2 mFragment2 = null;
     public static final String PREFS_NAME = "MyPrefsFile";
 	
-    
-    public static final String DATA_PATH = Environment.getExternalStorageDirectory().toString() + "/Scrapr/tessdata/";
+    public static final String DATA_PATH_SCRAPR = Environment.getExternalStorageDirectory().toString() + "/Scrapr/";
+    public static final String DATA_PATH_TESS = Environment.getExternalStorageDirectory().toString() + "/Scrapr/tessdata/";
+
     public static final String lang = "eng";
 	private static final String TAG = "MainActivity.java";
     
@@ -52,24 +52,54 @@ public class MainActivity extends ActionBarActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		// First set the content view of the main activity
 		setContentView(R.layout.activity_main);
-		
-		
+				
         // Create Scrapr folder if it does not exist and create new  filepath and File
-        File folder = new File(DATA_PATH);
-    	folder.mkdir();
+        File folderScrapr = new File(DATA_PATH_SCRAPR);
+    	folderScrapr.mkdir();
+    	
+    	// Create tessdata folder within Scrapr folder which holds the TESS OCR trained data
+        File folderTess = new File(DATA_PATH_TESS);
+    	folderTess.mkdir();
 		
-			
+    	// Copy the contents of the traineddata OCR file from the assets folder to a local directory on the phone
+        if (!(new File(DATA_PATH_TESS + lang + ".traineddata")).exists()) {
+			try {
+
+				AssetManager assetManager = getAssets();
+				InputStream in = assetManager.open("tessdata/" + lang + ".traineddata");
+				//GZIPInputStream gin = new GZIPInputStream(in);
+				OutputStream out = new FileOutputStream(DATA_PATH_TESS + lang + ".traineddata");
+
+				// Transfer bytes from in to out
+				byte[] buf = new byte[1024];
+				int len;
+				//while ((lenf = gin.read(buff)) > 0) {
+				while ((len = in.read(buf)) > 0) {
+					out.write(buf, 0, len);
+				}
+				in.close();
+				//gin.close();
+				out.close();
+
+				Log.v(TAG, "Copied " + lang + " traineddata");
+			} catch (IOException e) {
+				Log.e(TAG, "Was unable to copy " + lang + " traineddata " + e.toString());
+			}
+		}
+    		
+    	// Set the navigation drawer properties
 		mTitle = mDrawerTitle = getTitle();
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerList = (ListView) findViewById(R.id.left_drawer);
         menuTitles = getResources().getStringArray(R.array.menuTitles);
-
         
-        // set a custom shadow that overlays the main content when the drawer opens
+        // Set a custom shadow that overlays the main content when the drawer opens
         mDrawer.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         
-        // enable ActionBar app icon to behave as action to toggle nav drawer
+        // Enable ActionBar app icon to behave as action to toggle nav drawer
         bar = getSupportActionBar();
         bar.setDisplayHomeAsUpEnabled(true);
         bar.setHomeButtonEnabled(true);
@@ -104,35 +134,11 @@ public class MainActivity extends ActionBarActivity {
             }
         };
         
-        mDrawer.setDrawerListener(mDrawerToggle);
+        // Attacht the toggle to the drawer
+        mDrawer.setDrawerListener(mDrawerToggle);   
         
-        
-        if (!(new File(DATA_PATH + lang + ".traineddata")).exists()) {
-			try {
-
-				AssetManager assetManager = getAssets();
-				InputStream in = assetManager.open("tessdata/" + lang + ".traineddata");
-				//GZIPInputStream gin = new GZIPInputStream(in);
-				OutputStream out = new FileOutputStream(DATA_PATH + lang + ".traineddata");
-
-				// Transfer bytes from in to out
-				byte[] buf = new byte[1024];
-				int len;
-				//while ((lenf = gin.read(buff)) > 0) {
-				while ((len = in.read(buf)) > 0) {
-					out.write(buf, 0, len);
-				}
-				in.close();
-				//gin.close();
-				out.close();
-
-				Log.v(TAG, "Copied " + lang + " traineddata");
-			} catch (IOException e) {
-				Log.e(TAG, "Was unable to copy " + lang + " traineddata " + e.toString());
-			}
-		}
-        
-        
+        // Start the first 'home' fragment when the app is started
+        selectItem(0);
 	}
 	
 	@Override
@@ -142,15 +148,34 @@ public class MainActivity extends ActionBarActivity {
 		return true;
 	}
 	
-	// Whenever invalidateOptionsMenu() is called
+	// This method is called whenever invalidateOptionsMenu() is called
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         // If the nav drawer is open, hide action items related to the content view
         boolean drawerOpen = mDrawer.isDrawerOpen(mDrawerList);
-//        menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
+        
+        // Set the visibility of menu items when drawer is open or closed
+        menu.findItem(R.id.action_search).setVisible(!drawerOpen);
+        menu.findItem(R.id.action_refresh).setVisible(!drawerOpen);
         return super.onPrepareOptionsMenu(menu);
     }
 	
+	@Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // Pass any configuration change to the drawer toggle
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+    
+    
+    //-----------------Helper methods-----------------
     
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -231,20 +256,7 @@ public class MainActivity extends ActionBarActivity {
 	    bar.setTitle(mTitle);
 	}
 	
-	@Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        // Sync the toggle state after onRestoreInstanceState has occurred.
-        mDrawerToggle.syncState();
-    }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        // Pass any configuration change to the drawer toggls
-        mDrawerToggle.onConfigurationChanged(newConfig);
-    }
-    
     
     @Override
     public void onBackPressed()
