@@ -1,7 +1,5 @@
 package com.sebastiaanstuij.scrapr;
 
-import java.util.List;
-
 import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
@@ -66,17 +64,19 @@ public class CustomAdapter extends BaseAdapter {
 			holder.product_description = (TextView) convertView
 					.findViewById(R.id.productSubtitle);
 
-			Screenshot row_pos = rowItems[position];
-
-			holder.screenshot_pic.setImageURI(Uri.parse(row_pos.iconFilePath));
-			holder.website_description.setText(row_pos.url);
-			holder.date_added.setText("test");
-			holder.product_description.setText("test");
+			
 
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolder) convertView.getTag();
 		}
+		
+		Screenshot row_pos = rowItems[position];
+		holder.screenshot_pic.setImageURI(Uri.parse(row_pos.iconFilePath));
+		holder.website_description.setText(row_pos.url);
+		holder.date_added.setText("test");
+		holder.product_description.setText("test");
+
 
 		return convertView;
 	}

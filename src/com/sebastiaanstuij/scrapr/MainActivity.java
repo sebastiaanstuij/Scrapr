@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import android.content.Context;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -39,11 +41,11 @@ public class MainActivity extends ActionBarActivity {
 	private CharSequence mDrawerTitle;
     private CharSequence mTitle;
     
-    private Fragment2 mFragment2 = null;
+    private WebviewFragment mFragment2 = null;
     public static final String PREFS_NAME = "MyPrefsFile";
 	
-    public static final String DATA_PATH_SCRAPR = Environment.getExternalStorageDirectory().toString() + "/Scrapr/";
-    public static final String DATA_PATH_TESS = Environment.getExternalStorageDirectory().toString() + "/Scrapr/tessdata/";
+    public String DATA_PATH_SCRAPR;
+    public String DATA_PATH_TESS;
 
     public static final String lang = "eng";
 	private static final String TAG = "MainActivity.java";
@@ -55,15 +57,30 @@ public class MainActivity extends ActionBarActivity {
 		
 		// First set the content view of the main activity
 		setContentView(R.layout.activity_main);
-				
-        // Create Scrapr folder if it does not exist and create new  filepath and File
-        File folderScrapr = new File(DATA_PATH_SCRAPR);
-    	folderScrapr.mkdir();
-    	
-    	// Create tessdata folder within Scrapr folder which holds the TESS OCR trained data
-        File folderTess = new File(DATA_PATH_TESS);
-    	folderTess.mkdir();
 		
+		try {
+			if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())){
+				DATA_PATH_SCRAPR = Environment.getExternalStorageDirectory().toString() + "/Scrapr/";
+				DATA_PATH_TESS = Environment.getExternalStorageDirectory().toString() + "/Scrapr/tessdata/";
+			} else{
+				DATA_PATH_SCRAPR = getDataDir(getApplicationContext()) + "/Scrapr/";
+				DATA_PATH_TESS = getDataDir(getApplicationContext()) + "/Scrapr/tessdata";
+			}		
+			
+	        // Create Scrapr folder if it does not exist and create new  filepath and File
+	        File folderScrapr = new File(DATA_PATH_SCRAPR);
+	    	folderScrapr.mkdir();
+	    	
+	    	// Create tessdata folder within Scrapr folder which holds the TESS OCR trained data
+	        File folderTess = new File(DATA_PATH_TESS);
+	    	folderTess.mkdir();
+					    	
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+ 	    	
     	// Copy the contents of the traineddata OCR file from the assets folder to a local directory on the phone
         if (!(new File(DATA_PATH_TESS + lang + ".traineddata")).exists()) {
 			try {
@@ -203,7 +220,7 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
     
-	/** Swaps fragments in the main content view */
+	// Swaps fragments in the main content view
 	private void selectItem(int position) {
 	    // Create a new fragment
 		Fragment fragment;
@@ -215,7 +232,7 @@ public class MainActivity extends ActionBarActivity {
         switch (position)
         {    
             case 0:
-                fragment = new Fragment1();
+                fragment = new HomeScreenFragment();
                 // Insert fragment1 by replacing any existing fragment
         	    fragmentManager.beginTransaction()
         	                   .replace(R.id.content_frame, fragment, "fragment1")
@@ -223,7 +240,7 @@ public class MainActivity extends ActionBarActivity {
                 break;
             case 1:
             	
-                mFragment2 = new Fragment2();
+                mFragment2 = new WebviewFragment();
                 // Insert fragment2 by replacing any existing fragment
         	    fragmentManager.beginTransaction()
         	                   .replace(R.id.content_frame, mFragment2, "fragment2")
@@ -237,7 +254,7 @@ public class MainActivity extends ActionBarActivity {
         	                   .commit();
                 break;
             default:
-                fragment = new Fragment1();
+                fragment = new HomeScreenFragment();
                 // Insert fragment1 by replacing any existing fragment
         	    fragmentManager.beginTransaction()
         	                   .replace(R.id.content_frame, fragment, "fragment1")
@@ -255,16 +272,14 @@ public class MainActivity extends ActionBarActivity {
 	    mTitle = title;
 	    bar.setTitle(mTitle);
 	}
-	
-
     
     @Override
     public void onBackPressed()
     {
-    	// Kijk of mFragment2 een object bevat. Zo ja, dan is hij in beeld. In selectItem wordt namelijk mFragment2
+    	// Check whether mFragment2 contains an object. If that is the case, it is currently in view.
     	if (mFragment2 != null) {
-    		// Als de functie waar is, beeindig de huidige functie, zodat super.onBackPressed(); niet wordt uitgevoerd
-    		// Als je deze wel uitvoert, heb je ook nog dat je een scherm terug gaat en dat wil je niet
+    		// If the method returns true, end the current method so that super.onBackPressed() is not called.
+    		// otherwise the application will go back another screen, which is not what the user wants
     		if (mFragment2.onBackPressed()) {
     			return;
     		}
@@ -273,5 +288,11 @@ public class MainActivity extends ActionBarActivity {
         super.onBackPressed();
     }
 	
-	
+   
+    
+    // gets this application's datadir when external storage is not available
+    public String getDataDir(Context context) throws NameNotFoundException
+    {
+        return context.getPackageManager().getPackageInfo(getPackageName(), 0).applicationInfo.dataDir;
+    }
 }

@@ -3,15 +3,13 @@ package com.sebastiaanstuij.scrapr;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
@@ -27,7 +25,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.webkit.WebIconDatabase;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
@@ -37,15 +34,20 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.ZoomButtonsController;
 
 
-public class Fragment2 extends Fragment {
+public class WebviewFragment extends Fragment {
 
 	private String currentURL = "http://www.google.com";
 	private WebView mWebView;
 	private SelectionView selectionView;
+	//TODO variabel maken: downloaden language pack
 	public static final String DATA_PATH = Environment.getExternalStorageDirectory().toString() + "/Scrapr/";
     public static final String lang = "eng";
 	public static final String OCR_DATA_PATH = DATA_PATH + "tessdata/" + lang + ".traineddata";
-			
+	public Bitmap screenshotBitmap, iconBitmap; 
+	File screenshotFile, iconFile;
+	String screenshotFilePath, iconFilePath;
+	
+	
 	public void init(String url) {
 		currentURL = "http://www.google.com";
 	}
@@ -116,7 +118,6 @@ public class Fragment2 extends Fragment {
         }
         return v;
     }
-
 	
 	@SuppressLint("SetJavaScriptEnabled")
 	public void updateUrl(String url) {
@@ -175,7 +176,8 @@ public class Fragment2 extends Fragment {
 	    // may be called multiple times if the mode is invalidated.
 	    @Override
 	    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-	        return false; // Return false if nothing is done
+	        // Return false if nothing is done
+	    	return false; 
 	    }
 
 	    // Called when the user selects a contextual menu item
@@ -183,67 +185,47 @@ public class Fragment2 extends Fragment {
 	    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {	
 	        switch (item.getItemId()) {
 	            case R.id.action_selection:
+	            	
+	            	
 	            	// Create bitmap and call visibleRegion method
-                    Bitmap screenshotBitmap = getBitmapForVisibleRegion(mWebView);         
-                    Rect rect = selectionView.getSelection();
-                    
-                    screenshotBitmap = Bitmap.createBitmap(screenshotBitmap, rect.left, rect.top, (rect.width()), rect.height());
-     
-                    Bitmap iconBitmap =  mWebView.getFavicon();
-                    if (iconBitmap == null){
-                    	iconBitmap = screenshotBitmap;
-                    }
-                    
-                    
-                    String curDate = (DateFormat.format("dd-MM-yyyy hh:mm:ss", new java.util.Date()).toString());
-					String screenshotFilePath = DATA_PATH + "screenshot_" + curDate + ".png";
-					String iconFilePath = DATA_PATH + "icon_" + curDate + ".png";
-
-					
-                    File screenshotFile = new File(screenshotFilePath);
-                    File iconFile = new File(iconFilePath);
-                    
-                    
-                    TessBaseAPI baseApi = new TessBaseAPI();
-                    baseApi.init(DATA_PATH, "eng");
-                    baseApi.setImage(screenshotBitmap);
-                    String recognizedText = baseApi.getUTF8Text();
-                    baseApi.end();
-                    
-                    try { 
-                    	screenshotBitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(screenshotFile));                      
-                    	iconBitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(iconFile));                      
-                    	
-                        // Add screenshot properties to sharedPreferences so that it can be accessed in MainActivity
-                        SharedPreferences settings = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, 0);
-                        SharedPreferences.Editor editor = settings.edit();
-                        
-                    	int size = settings.getInt("array_size", 0); // Get size of Sceenshot Array, or create new size preference 
-                        editor.putString("screenshotFilePath_" + size, screenshotFilePath);
-                        editor.putString("iconFilePath_" + size, iconFilePath);
-                        editor.putString("recognizedText_" + size, recognizedText);
-                        editor.putString("url_" + size, mWebView.getUrl());
-                        editor.putInt("x_cor_" + size, (int) mWebView.getLeft());
-                        editor.putInt("y_cor_" + size, (int) mWebView.getTop());
-                        editor.putInt("zoom_lvl_" + size, (int) mWebView.getScale());
-                        editor.putInt("array_size", size+1);                        
-                        
-                       
-                        // Commit the edits!
-                        editor.commit();
-               
-                        // Action picked, so close the CAB and return true
-    	                mode.finish(); 
-    	                return true;
-                    	
-                    } 
-                    
-                    catch (IOException e) { 
-                    	//TODO opslaan ging fout
-                    	e.printStackTrace();                  	
-                    }
-   
+	                screenshotBitmap = getBitmapForVisibleRegion(mWebView);         
+	                Rect rect = selectionView.getSelection();
 	                
+	                screenshotBitmap = Bitmap.createBitmap(screenshotBitmap, rect.left, rect.top, (rect.width()), rect.height());
+
+	                iconBitmap =  mWebView.getFavicon();
+	                if (iconBitmap == null){
+	                	iconBitmap = screenshotBitmap;
+	                }
+	                	          
+	                	                
+	                String curDate = (DateFormat.format("dd-MM-yyyy hh:mm:ss", new java.util.Date()).toString());
+	    			screenshotFilePath = DATA_PATH + "screenshot_" + curDate + ".png";
+	    			iconFilePath = DATA_PATH + "icon_" + curDate + ".png";
+
+	    			
+	                screenshotFile = new File(screenshotFilePath);
+	                iconFile = new File(iconFilePath);
+	                
+	                // 
+	            	new BackgroundOperation().execute(screenshotBitmap);
+	                
+	                /*TessBaseAPI baseApi = new TessBaseAPI();
+	                baseApi.init(DATA_PATH, "eng");
+	                baseApi.setImage(screenshotBitmap);
+	                String recognizedText = baseApi.getUTF8Text();
+	                baseApi.end();*/
+	                
+	                
+	            	
+	            	
+	            	
+	            	
+	                // Action picked, so close the CAB and return true
+	                mode.finish(); 
+	                return true;
+	            	
+	            	
 	            default:
 	                return false;
 	        }
@@ -256,7 +238,68 @@ public class Fragment2 extends Fragment {
 	        //mActionMode = null;
 	    }
 	};
+		
+
 	
-	
-	
+	private class BackgroundOperation extends AsyncTask<Bitmap, Void, String> {
+
+	    @Override
+	    protected String doInBackground(Bitmap... scrshotBitmap) {
+	    	
+	    	try {
+				screenshotBitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(screenshotFile));
+				iconBitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(iconFile));  
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}  
+	            		    		
+	    	 TessBaseAPI baseApi = new TessBaseAPI();
+             baseApi.init(DATA_PATH, "eng");
+             baseApi.setImage(scrshotBitmap[0]);
+             String recognizedText = baseApi.getUTF8Text();
+             baseApi.end();
+             
+             return recognizedText;
+	    }
+
+	    @Override
+	    protected void onPostExecute(String recTxt) {
+
+			// Add screenshot properties to sharedPreferences so that it can be
+			// accessed in MainActivity
+			SharedPreferences settings = getActivity().getSharedPreferences(
+					MainActivity.PREFS_NAME, 0);
+			SharedPreferences.Editor editor = settings.edit();
+
+			// Get size of Sceenshot Array or create new size preference
+			int size = settings.getInt("array_size", 0); 
+
+			editor.putString("screenshotFilePath_" + size, screenshotFilePath);
+			editor.putString("iconFilePath_" + size, iconFilePath);
+			editor.putString("recognizedText_" + size, recTxt);
+			editor.putString("url_" + size, mWebView.getUrl());
+			//editor.putInt("x_" + size, (int) mWebView.getScrollX());
+			//editor.putInt("y_" + size, (int) mWebView.getScrollY());
+			editor.putInt("x_" + size, (int) selectionView.X1);
+			editor.putInt("y_" + size, (int) selectionView.Y1);
+			editor.putInt("zoom_" + size, (int) mWebView.getScale());
+			
+			editor.putInt("array_size", size + 1);
+
+			// Commit the edits!
+			editor.commit();
+    	
+	    }
+
+	    @Override
+	    protected void onPreExecute() {}
+
+	    @Override
+	    protected void onProgressUpdate(Void... values) {}
+	}
+			
 }
+
+
+

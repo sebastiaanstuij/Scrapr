@@ -13,7 +13,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 
-public class Fragment1 extends Fragment implements OnItemClickListener {
+public class HomeScreenFragment extends Fragment implements OnItemClickListener {
 
 	
 	Screenshot[] screenshotArray;
@@ -41,6 +41,7 @@ public class Fragment1 extends Fragment implements OnItemClickListener {
         	screenshotArray[i].screenshotFilePath = settings.getString("screenshotFilePath_" + i, "NA");
         	screenshotArray[i].iconFilePath = settings.getString("iconFilePath_" + i, "NA");
         	screenshotArray[i].recognizedText = settings.getString("recognizedText_" + i, "NA");
+        	
         }
 
 		
@@ -65,7 +66,9 @@ public class Fragment1 extends Fragment implements OnItemClickListener {
 		// TODO Auto-generated method stub
 
 		String recognizedText = screenshotArray[position].recognizedText;
-		Toast.makeText(getActivity().getApplicationContext(), recognizedText,
+		String x_cor = String.valueOf(screenshotArray[position].x);
+		String y_cor = String.valueOf(screenshotArray[position].y);
+		Toast.makeText(getActivity().getApplicationContext(), x_cor + "-" + y_cor,
 				Toast.LENGTH_SHORT).show();
 	}
 
